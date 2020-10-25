@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- package com.google.firebase.example.fireeats;
+package com.google.firebase.example.fireeats;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -80,7 +80,7 @@ public class RestaurantDetailActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant_detail);
-        
+
         mImageView = findViewById(R.id.restaurant_image);
         mNameView = findViewById(R.id.restaurant_name);
         mRatingIndicator = findViewById(R.id.restaurant_rating);

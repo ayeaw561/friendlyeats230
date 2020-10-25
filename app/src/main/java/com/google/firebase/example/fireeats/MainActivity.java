@@ -1,19 +1,5 @@
-/**
- * Copyright 2017 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
- package com.google.firebase.example.fireeats;
+
+package com.google.firebase.example.fireeats;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,7 +14,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -41,6 +27,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.example.fireeats.util.RestaurantUtil;
+import com.google.firebase.example.fireeats.model.Restaurant;
 
 import java.util.Collections;
 
@@ -86,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements
         findViewById(R.id.button_clear_filter).setOnClickListener(this);
 
         // View model
-        mViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+        mViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
         // Enable Firestore logging
         FirebaseFirestore.setLoggingEnabled(true);
@@ -98,9 +88,23 @@ public class MainActivity extends AppCompatActivity implements
         // Filter Dialog
         mFilterDialog = new FilterDialogFragment();
     }
-
+/* Codelab Step 4 initFirestore()
+** old code ****
     private void initFirestore() {
         // TODO(developer): Implement
+    }
+*/
+
+    // *** new code Step 4 ***
+    private void initFirestore() {
+        mFirestore = FirebaseFirestore.getInstance();
+
+        // ** Step 5 new code ***
+        // Get the 50 highest rated restaurants
+        mQuery = mFirestore.collection("restaurants")
+                .orderBy("avgRating", Query.Direction.DESCENDING)
+                .limit(LIMIT);
+
     }
 
     private void initRecyclerView() {
@@ -161,15 +165,71 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    /*  Codelab Step 4 onAddItemsClicked()
+
+    *** old Code ***
     private void onAddItemsClicked() {
         // TODO(developer): Add random restaurants
         showTodoToast();
     }
+    */
+// *** new code ***  Step 4 onAddItemsClicked()
+    private void onAddItemsClicked() {
+        // Get a reference to the restaurants collection
+        CollectionReference restaurants = mFirestore.collection("restaurants");
 
+        for (int i = 0; i < 10; i++) {
+            // Get a random Restaurant POJO
+            Restaurant restaurant = RestaurantUtil.getRandom(this);
+
+            // Add a new document to the restaurants collection
+            restaurants.add(restaurant);
+        }
+    }
+
+    /*
+        @Override
+        public void onFilter(Filters filters) {
+            // TODO(developer): Construct new query
+            showTodoToast();
+            // Set header
+            mCurrentSearchView.setText(Html.fromHtml(filters.getSearchDescription(this)));
+            mCurrentSortByView.setText(filters.getOrderDescription(this));
+            // Save filters
+            mViewModel.setFilters(filters);
+        }
+    */
     @Override
     public void onFilter(Filters filters) {
-        // TODO(developer): Construct new query
-        showTodoToast();
+        // Construct query basic query
+        Query query = mFirestore.collection("restaurants");
+
+        // Category (equality filter)
+        if (filters.hasCategory()) {
+            query = query.whereEqualTo("category", filters.getCategory());
+        }
+
+        // City (equality filter)
+        if (filters.hasCity()) {
+            query = query.whereEqualTo("city", filters.getCity());
+        }
+
+        // Price (equality filter)
+        if (filters.hasPrice()) {
+            query = query.whereEqualTo("price", filters.getPrice());
+        }
+
+        // Sort by (orderBy with direction)
+        if (filters.hasSortBy()) {
+            query = query.orderBy(filters.getSortBy(), filters.getSortDirection());
+        }
+
+        // Limit items
+        query = query.limit(LIMIT);
+
+        // Update the query
+        mQuery = query;
+        mAdapter.setQuery(query);
 
         // Set header
         mCurrentSearchView.setText(Html.fromHtml(filters.getSearchDescription(this)));
@@ -178,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements
         // Save filters
         mViewModel.setFilters(filters);
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
