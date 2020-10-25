@@ -1,0 +1,36 @@
+COMSC230 project notes
+
+Point this project to a repo on your Github:
+
+In VSCode terminal:
+
+// Command to see the origin url:
+
+git remote show origin
+
+// After you clone it you should see:
+
+(base) friendlyeats-android tnewman $git remote show origin
+* remote origin
+  Fetch URL: https://github.com/rhodyapps/Comsc230-friendlyeats
+  Push  URL: https://github.com/rhodyapps/Comsc230-friendlyeats
+  HEAD branch: master
+  Remote branch:
+    master tracked
+
+// In your Github, create a new repository for this project.
+// copy the url to your repo for this project
+// then remove the origin (if it is pointing to rhodyapps)
+
+git remote rm origin
+
+// now you can re-point the local repo to your new github repo:
+
+git remote add origin <paste in the url of your github repo for this project>
+
+// Check it again
+git remote show origin
+
+// Make a change in one of the files (ie: add a blank line to MainActivity.java) and
+// Use the VSCode github function (icon on the left) to push the change to github.
+// Since this is the initial commit, it will push all of the code.
