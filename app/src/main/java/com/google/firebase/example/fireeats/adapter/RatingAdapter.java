@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.example.fireeats.R;
 import com.google.firebase.example.fireeats.model.Rating;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.Query;
 
 import me.zhanghai.android.materialratingbar.MaterialRatingBar;
