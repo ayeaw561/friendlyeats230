@@ -98,7 +98,9 @@ public class MainActivity extends AppCompatActivity implements
     // *** new code Step 4 ***
     private void initFirestore() {
         mFirestore = FirebaseFirestore.getInstance();
-
+        CollectionReference subRef = mFirestore.collection("restaurants")
+                .document("abc123")
+                .collection("ratings");
         // ** Step 5 new code ***
         // Get the 50 highest rated restaurants
         mQuery = mFirestore.collection("restaurants")
